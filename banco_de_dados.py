@@ -1,14 +1,51 @@
-import mysql.connector
+import sqlite3
+from dados_ph import VALORES_PH
+
+NOME_BANCO = "monitoramento_agua.db"
+
 
 def conectar():
-    conexao = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="monitoramento_agua"
+    return sqlite3.connect(NOME_BANCO)
+
+
+def criar_tabela():
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS leituras (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            valor REAL NOT NULL,
+            data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    conexao.commit()
+    cursor.close()
+    conexao.close()
+
+
+def limpar_tabela():
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute("DELETE FROM leituras")
+    conexao.commit()
+    cursor.close()
+    conexao.close()
+
+
+def inserir_dados():
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.executemany(
+        "INSERT INTO leituras (valor) VALUES (?)",
+        [(valor,) for valor in VALORES_PH]
     )
-  
-    return conexao
+
+    conexao.commit()
+    cursor.close()
+    conexao.close()
 
 
 def obter_dados():
@@ -21,5 +58,11 @@ def obter_dados():
     cursor.close()
     conexao.close()
 
-    # transformar em lista simples
     return [dado[0] for dado in dados]
+
+
+if __name__ == "__main__":
+    criar_tabela()
+    limpar_tabela()
+    inserir_dados()
+    print("Banco SQLite criado e dados inseridos com sucesso.")
