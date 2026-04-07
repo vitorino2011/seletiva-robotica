@@ -187,7 +187,164 @@ O sistema pode ser alimentado por:
 * Regulador de tensão
 
 ---
+# 📘 Sistema de Monitoramento de Qualidade da Água com Arduino
 
+## 📌 Visão Geral do Projeto
+
+Este projeto consiste em um sistema automatizado de monitoramento da qualidade da água, com foco na medição de pH, sinalização visual e exibição de dados em tempo real. A arquitetura foi pensada para ser funcional, lógica e tecnicamente coerente, evitando ligações aleatórias e priorizando organização — exatamente como um bom circuito deve ser.
+
+A proposta integra geração de energia, sensoriamento, processamento e interface com o usuário, formando um ecossistema completo e didático.
+
+---
+
+## Possivel circuto a ser ultilizado
+<div>
+<img width="1536" height="1024" alt="Image" src="https://github.com/user-attachments/assets/6149b0ff-c3d5-4ccc-9854-cd7fca1d7bb1" />
+</div>
+
+## ⚙️ Componentes Utilizados
+
+### 🔹 1. Arduino (Microcontrolador)
+
+O Arduino é o “cérebro” do circuito. Ele recebe os dados do sensor de pH, processa essas informações e toma decisões com base em parâmetros previamente definidos.
+
+**Função principal:**
+
+* Ler sinais analógicos (sensor de pH)
+* Controlar saídas digitais (LEDs)
+* Comunicar-se com o display LCD via protocolo I2C
+
+**Justificativa técnica:**
+A escolha do Arduino se dá pela sua versatilidade, baixo custo e facilidade de integração com sensores e módulos diversos. Para projetos educacionais ou protótipos, ele resolve sem drama — e sem gambiarra.
+
+---
+
+### 🔹 2. Sensor de pH
+
+Responsável por medir a acidez ou alcalinidade da água, fornecendo um sinal analógico proporcional ao valor de pH.
+
+**Faixa típica:**
+
+* 0 a 14 (ácido → neutro → básico)
+
+**Função no sistema:**
+
+* Enviar dados contínuos ao Arduino
+* Permitir análise da qualidade da água
+
+**Justificativa:**
+Sem medição, não há monitoramento. Esse sensor é o elemento central do projeto, pois define o comportamento de todo o restante do sistema.
+
+---
+
+### 🔹 3. Display LCD com Interface I2C
+
+Utilizado para exibir os valores de pH e mensagens informativas ao usuário.
+
+**Características:**
+
+* Comunicação via I2C (reduz número de fios)
+* Exibição em tempo real
+
+**Função:**
+
+* Mostrar dados coletados
+* Informar status do sistema
+
+**Justificativa:**
+A interface I2C foi escolhida por economia de pinos e organização do circuito. Menos fios, menos confusão — simples assim.
+
+---
+
+### 🔹 4. LEDs (Verde e Vermelho)
+
+Atuam como indicadores visuais do estado da água.
+
+**Função:**
+
+* 🔴 LED Vermelho: alerta de pH fora do padrão
+* 🟢 LED Verde: condição segura/ideal
+
+**Justificativa:**
+Feedback visual imediato é essencial. Nem sempre o usuário vai ler o display — mas uma luz vermelha acesa chama atenção na hora.
+
+---
+
+### 🔹 5. Resistores
+
+Associados aos LEDs para limitar a corrente elétrica.
+
+**Função:**
+
+* Evitar que os LEDs queimem
+* Controlar intensidade da corrente
+
+**Justificativa:**
+Ignorar resistor é pedir pra queimar componente. Aqui não tem espaço para “ligar direto e ver no que dá”.
+
+---
+
+### 🔹 6. Placa Solar
+
+Responsável por fornecer energia ao sistema, promovendo autonomia energética.
+
+**Função:**
+
+* Alimentar o circuito de forma sustentável
+* Reduzir dependência de fontes externas
+
+**Justificativa:**
+Ideal para aplicações em campo ou locais remotos. Além disso, agrega valor ecológico ao projeto.
+
+---
+
+### 🔹 7. Protoboard (Breadboard)
+
+Base de montagem do circuito.
+
+**Função:**
+
+* Permitir conexões sem solda
+* Facilitar testes e alterações
+
+**Justificativa:**
+Ambiente controlado para prototipagem. Organização aqui evita dor de cabeça depois.
+
+---
+
+### 🔹 8. Jumpers (Fios de Conexão)
+
+Realizam as interligações entre os componentes.
+
+**Função:**
+
+* Conectar módulos de forma lógica
+* Transportar sinais e energia
+
+**Boas práticas adotadas:**
+
+* Cores padronizadas (vermelho = VCC, preto = GND, etc.)
+* Fios com destino definido (sem “pontas soltas”)
+* Organização paralela (evitando cruzamentos desnecessários)
+
+**Justificativa:**
+Circuito bem feito não é só funcional — ele é legível. Aqui, estética e técnica andam juntas.
+
+---
+
+## 🔌 Lógica de Funcionamento
+
+1. A placa solar fornece energia ao sistema.
+2. O Arduino inicializa e começa a leitura do sensor de pH.
+3. O valor lido é processado e convertido.
+4. O resultado é exibido no LCD.
+5. Com base no valor:
+
+   * Se estiver dentro do intervalo ideal → LED verde acende
+   * Caso contrário → LED vermelho é acionado
+6. O sistema opera continuamente, em tempo real.
+
+---
 
 
 
