@@ -1,144 +1,104 @@
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include <Wire.h> // Aqui fiz a inclusão da biblioteca de comunicação I2C.
+#include <LiquidCrystal_I2C.h> // Aqui fiz a inclusão da biblioteca do display LCD com interface I2C.
 
-// Eu estou utilizando um display LCD com comunicação I2C
-LiquidCrystal_I2C lcd(0x27, 16, 2); 
+// Aqui fiz a configuração do display LCD no endereço 0x27, com 16 colunas e 2 linhas.
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-// Aqui eu defino os pinos do Arduino
-const int PINO_SENSOR_PH = A0; // pino do sensor como A0 = pino analógico;
-const int LED_VERDE = 7; //led verde como pino digital = 7
-const int LED_VERMELHO = 8; //pino vermelho digital = 8
+// Aqui fiz a definição dos pinos utilizados no Arduino.
+const int PINO_SENSOR_PH = A0; // Aqui fiz a definição do pino analógico do sensor de pH.
+const int LED_VERDE = 7; // Aqui fiz a definição do pino digital do LED verde.
+const int LED_VERMELHO = 8; // Aqui fiz a definição do pino digital do LED vermelho.
 
-// Esses valores eu uso como referência para o cálculo do pH
-const float TENSAO_REFERENCIA = 5.0; 
-const int RESOLUCAO_ADC = 1023;
+// Aqui fiz a definição dos parâmetros usados no cálculo da tensão.
+const float TENSAO_REFERENCIA = 5.0; // Aqui considerei a tensão de referência do Arduino.
+const int RESOLUCAO_ADC = 1023; // Aqui considerei a resolução do conversor analógico-digital de 10 bits.
 
-// Aqui eu defino a faixa segura da água
-const float LIMITE_INFERIOR = 6.5;
-const float LIMITE_SUPERIOR = 8.5;
+// Aqui fiz a definição da faixa segura do pH.
+const float LIMITE_INFERIOR = 6.5; // Aqui fixei o limite inferior da faixa segura.
+const float LIMITE_SUPERIOR = 8.5; // Aqui fixei o limite superior da faixa segura.
 
-// ------------------------------------------------------
-// Função que eu criei para ler o sensor de pH
-// Eu faço várias leituras e tiro uma média para evitar ruído
-// ------------------------------------------------------
-float lerTensaoPH() {
-  long soma = 0;
-  const int amostras = 10;
+float lerTensaoPH() { // Aqui fiz a criação da função que lê a tensão média do sensor.
+  long soma = 0; // Aqui fiz a variável que acumula as leituras analógicas.
+  const int amostras = 10; // Aqui defini a quantidade de amostras para calcular a média.
 
-  for (int i = 0; i < amostras; i++) {
-    soma += analogRead(PINO_SENSOR_PH);
-    delay(20);
+  for (int i = 0; i < amostras; i++) { // Aqui fiz um laço para repetir a leitura do sensor.
+    soma += analogRead(PINO_SENSOR_PH); // Aqui fiz a leitura analógica e somei o resultado.
+    delay(20); // Aqui fiz uma pequena pausa entre as leituras para estabilização.
   }
 
-  float media = soma / (float)amostras;
-
-  // Aqui eu converto o valor analógico em tensão
-  float tensao = media * TENSAO_REFERENCIA / RESOLUCAO_ADC;
-  return tensao;
+  float media = soma / (float)amostras; // Aqui fiz o cálculo da média das leituras.
+  float tensao = media * TENSAO_REFERENCIA / RESOLUCAO_ADC; // Aqui fiz a conversão do valor analógico em tensão.
+  return tensao; // Aqui fiz o retorno da tensão calculada.
 }
 
-// ------------------------------------------------------
-// Aqui eu converto a tensão em valor de pH
-// Essa fórmula é uma aproximação comum em sensores de pH
-// ------------------------------------------------------
-float converter_Para_PH(float tensao) {
-  float ph = 7.0 + ((2.5 - tensao) / 0.18);
+float converterParaPH(float tensao) { // Aqui fiz a criação da função que converte tensão em pH.
+  float ph = 7.0 + ((2.5 - tensao) / 0.18); // Aqui fiz o cálculo do pH com base na calibração adotada.
 
   /*
-  Expicação da fórmula:
-  A fórmula calcula o pH somando 7 ao quanto a tensão medida se afasta de 2,5 V,
-   dividido por 0,18 (fator de conversão do sensor).
-
-   7 = ph neutro;
+    Aqui fiz a explicação da fórmula:
+    parti do pH neutro, que é 7,0, e somei ou subtraí a variação
+    causada pela diferença entre a tensão medida e 2,5 V.
+    Depois, dividi essa diferença por 0,18, que foi o fator de conversão do sensor.
   */
 
-  return ph;
+  return ph; // Aqui fiz o retorno do valor de pH calculado.
 }
 
-// Eu classifico o pH em três estados
-
-String classificar_PH (float ph) {
-  if (ph < LIMITE_INFERIOR) {
-    return "ACIDO";
+String classificarPH(float ph) { // Aqui fiz a criação da função que classifica o pH.
+  if (ph < LIMITE_INFERIOR) { // Aqui verifiquei se o valor estava abaixo da faixa segura.
+    return "ACIDO"; // Aqui retornei a classificação ácida.
+  } else if (ph > LIMITE_SUPERIOR) { // Aqui verifiquei se o valor estava acima da faixa segura.
+    return "ALCALINO"; // Aqui retornei a classificação alcalina.
+  } else { // Aqui tratei a condição intermediária.
+    return "SEGURO"; // Aqui retornei a classificação segura.
   }
-  
-  else if (ph > LIMITE_SUPERIOR) {
-    return "ALCALINO";
-  }
-  
-  else {
-    return "SEGURO";
-  }
-
 }
 
+void setup() { // Aqui fiz a função de inicialização, executada uma única vez.
+  Serial.begin(9600); // Aqui fiz o início da comunicação serial.
 
-// SETUP - executa uma vez
-void setup() {
-  Serial.begin(9600);
+  pinMode(LED_VERDE, OUTPUT); // Aqui configurei o LED verde como saída.
+  pinMode(LED_VERMELHO, OUTPUT); // Aqui configurei o LED vermelho como saída.
 
-  // Eu configuro os LEDs como saída
-  pinMode(LED_VERDE, OUTPUT);
-  pinMode(LED_VERMELHO, OUTPUT);
+  lcd.init(); // Aqui fiz a inicialização do display LCD.
+  lcd.backlight(); // Aqui fiz o acionamento da luz de fundo do display.
 
-  // Eu inicio o LCD
-  lcd.init();
-  lcd.backlight();
+  lcd.setCursor(0, 0); // Aqui posicionei o cursor na primeira linha.
+  lcd.print("Sistema de pH"); // Aqui mostrei a mensagem inicial.
+  lcd.setCursor(0, 1); // Aqui posicionei o cursor na segunda linha.
+  lcd.print("Iniciando..."); // Aqui mostrei a mensagem de inicialização.
+  delay(2000); // Aqui mantive a mensagem por dois segundos.
 
-  // Mensagem inicial
-  lcd.setCursor(0, 0);
-  lcd.print("Sistema de pH");
-  lcd.setCursor(0, 1);
-  lcd.print("Iniciando...");
-  delay(2000);
-
-  lcd.clear();
+  lcd.clear(); // Aqui limpei o display após a mensagem inicial.
 }
 
-// LOOP - executa continuamente
-void loop() {
+void loop() { // Aqui fiz a função principal, executada continuamente.
+  float tensao = lerTensaoPH(); // Aqui fiz a leitura da tensão do sensor.
+  float ph = converterParaPH(tensao); // Aqui fiz a conversão da tensão para pH.
+  String status = classificarPH(ph); // Aqui fiz a classificação do valor encontrado.
 
-  // Eu faço a leitura do sensor
-  float tensao = lerTensaoPH();
-
-  // Eu converto essa leitura para pH
-  float ph = converterParaPH(tensao);
-
-  // Eu classifico o resultado
-  String status = classificarPH(ph);
-
-  // Aqui eu controlo os LEDs
-  if (status == "SEGURO") {
-    digitalWrite(LED_VERDE, HIGH);
-    digitalWrite(LED_VERMELHO, LOW);
-  } 
-
-  else {
-    digitalWrite(LED_VERDE, LOW);
-    digitalWrite(LED_VERMELHO, HIGH);
+  if (status == "SEGURO") { // Aqui verifiquei se a água estava na faixa segura.
+    digitalWrite(LED_VERDE, HIGH); // Aqui liguei o LED verde.
+    digitalWrite(LED_VERMELHO, LOW); // Aqui desliguei o LED vermelho.
+  } else { // Aqui tratei os casos fora da faixa segura.
+    digitalWrite(LED_VERDE, LOW); // Aqui desliguei o LED verde.
+    digitalWrite(LED_VERMELHO, HIGH); // Aqui liguei o LED vermelho.
   }
 
-  // Aqui eu mostro as informações no LCD
-  lcd.clear();
+  lcd.clear(); // Aqui limpei o display antes de atualizar as informações.
+  lcd.setCursor(0, 0); // Aqui posicionei o cursor na primeira linha.
+  lcd.print("pH: "); // Aqui mostrei o rótulo do valor de pH.
+  lcd.print(ph, 2); // Aqui mostrei o valor do pH com duas casas decimais.
 
-  lcd.setCursor(0, 0); // defini a posição das informações no LCD como 0
-  lcd.print("pH: "); //mostra as informações do PH de forma adaptavel
-  lcd.print(ph, 2);
+  lcd.setCursor(0, 1); // Aqui posicionei o cursor na segunda linha.
+  lcd.print(status); // Aqui mostrei a classificação da água.
 
-  lcd.setCursor(0, 1);
-  lcd.print(status);
+  Serial.print("Tensao: "); // Aqui iniciei a exibição da tensão no monitor serial.
+  Serial.print(tensao); // Aqui mostrei o valor da tensão.
+  Serial.print(" | pH: "); // Aqui mostrei o separador e o rótulo do pH.
+  Serial.print(ph); // Aqui mostrei o valor do pH.
+  Serial.print(" | Status: "); // Aqui mostrei o rótulo da classificação.
+  Serial.println(status); // Aqui mostrei a classificação final e quebrei a linha.
 
-  /*
-   Também envio os dados para o monitor serial
-   (eu uso isso para depuração)
-  */
-
-  Serial.print("Tensao: ");
-  Serial.print(tensao);
-  Serial.print(" | pH: ");
-  Serial.print(ph);
-  Serial.print(" | Status: ");
-  Serial.println(status);
-
-  delay(2000);
+  delay(1000); // Aqui esperei um segundo antes da próxima leitura.
 }
