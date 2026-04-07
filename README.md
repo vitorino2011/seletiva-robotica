@@ -16,7 +16,7 @@ Este documento contém **toda a documentação do sistema** em um único arquivo
 ## 🧪 Sensor de pH
 
 <div align="center">
-![Image](https://github.com/user-attachments/assets/f777c606-b47a-4460-8cc9-4646f0b6419f)
+<img width="1536" height="1024" alt="Image" src="https://github.com/user-attachments/assets/ec309c1f-b7a2-4614-9b03-ea8c717f5983" />
   <br>
   <em>Sensor de pH utilizado para medir acidez/alcalinidade</em>
 </div>
