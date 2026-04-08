@@ -161,7 +161,7 @@ plt.show()
 
 ---
 <div>
-  <img width="792" height="650" alt="Image" src="https://github.com/user-attachments/assets/2d260aec-a2b6-41bb-85a4-e7ec81572e23" />
+  <img width="792" height="450" alt="Image" src="https://github.com/user-attachments/assets/2d260aec-a2b6-41bb-85a4-e7ec81572e23" />
 </div>
 
 ## 🎯 Interpretação Visual
